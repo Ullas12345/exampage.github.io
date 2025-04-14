@@ -15,10 +15,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login & Online Exam</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
 
-    /* Apply Hind Siliguri font to body */
     body {
       font-family: "Hind Siliguri", sans-serif;
       margin: 0;
@@ -33,7 +34,7 @@
     .login-container {
       background-color: white;
       padding: 50px;
-      border-radius: 00px;
+      border-radius: 0px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       text-align: center;
       width: 300px;
@@ -55,7 +56,6 @@
     button {
       font-family: "Hind Siliguri", sans-serif;
       padding: 10px;
-      width: 100%;
       background-color: #f44336;
       color: white;
       border: none;
@@ -82,11 +82,20 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
+      min-height: 80vh;
+    }
+
+    .exam-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     h1 {
       color: red;
+      text-align: center;
+      margin-bottom: 10px;
     }
 
     #timer {
@@ -94,17 +103,52 @@
       color: red;
       margin-bottom: 5px;
       font-weight: normal;
+      text-align: center;
     }
 
     #exam-info {
       font-size: 16px;
       color: black;
       margin-bottom: 20px;
+      text-align: center;
+    }
+
+    #exam {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .chart-container {
+      width: 200px;
+      /* Slightly larger for impact */
+      height: 200px;
+      margin: 0 20px 10px 0;
+      background-color: #f9f9f9;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: none;
+      padding: 10px;
+    }
+
+    .chart-container.visible {
+      display: block;
+    }
+
+    .questions-wrapper {
+      flex: 1;
+      min-width: 300px;
     }
 
     .question-container {
       text-align: left;
       margin-bottom: 20px;
+      display: none;
+    }
+
+    .question-container.visible {
+      display: block;
     }
 
     .question-label {
@@ -116,7 +160,7 @@
       display: flex;
       align-items: center;
       cursor: pointer;
-      padding: 5px 5px;
+      padding: 5px;
       border-radius: 5px;
     }
 
@@ -151,56 +195,21 @@
       color: orange !important;
     }
 
-    .question-card {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-      overflow: auto;
-      flex-wrap: wrap;
-    }
-
-    .card {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 18px;
-      font-weight: bold;
-      margin: 5px;
-      border: 2px solid black;
-      background-color: white;
-      cursor: pointer;
-    }
-
-    .correct-card {
-      background-color: green !important;
-      color: white;
-    }
-
-    .incorrect-card {
-      background-color: red !important;
-      color: white;
-    }
-
-    .unattempted-card {
-      background-color: orange !important;
-      color: white;
-    }
-
-    button {
-      padding: 10px 20px;
+    #submitBtn {
+      padding: 15px 30px;
       background-color: #f44336;
       color: white;
       border: none;
       cursor: pointer;
-      font-size: 16px;
-      border-radius: 5px;
-      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 10px;
+      margin-top: 20px;
+      width: 200px;
+      transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    #submitBtn:hover {
       background-color: #d32f2f;
     }
 
@@ -216,6 +225,7 @@
       border-radius: 10px;
       text-align: center;
       display: none;
+      z-index: 1000;
     }
 
     .popup-header {
@@ -263,27 +273,29 @@
       style="width: 80%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
 
     <button onclick="validateLogin()"
-      style="padding: 15px 30px;  background-color: #f44336; color: white; border: none; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 5px; margin-top: 20px; width: 50%; transition: background-color 0.3s ease;"
+      style="padding: 15px 30px; background-color: #f44336; color: white; border: none; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 5px; margin-top: 20px; width: 50%; transition: background-color 0.3s ease;"
       onmouseover="this.style.backgroundColor='#d32f2f'" onmouseout="this.style.backgroundColor='#f44336'">লগিন</button>
 
     <p class="error" id="errorMessage"></p>
   </div>
 
-
   <div class="container" style="display: none;" id="examContainer">
-    <h1>বায়োলজি এক্স্যাম</h1>
-    <div id="timer">০১ মিনিট ০০ সেকেন্ড</div>
-    <div id="exam-info">পূর্ণ নম্বরঃ ১০০ </div>
+    <div class="exam-content">
+      <h1 id="exam-title">বায়োলজি এক্স্যাম</h1>
+      <div id="timer">০১ মিনিট ০০ সেকেন্ড</div>
+      <div id="exam-info">পূর্ণ নম্বরঃ ১০০ </div>
 
-    <div id="exam">
-      <!-- Questions will be generated dynamically -->
+      <div id="exam">
+        <div class="chart-container">
+          <canvas id="scoreChart"></canvas>
+        </div>
+        <div class="questions-wrapper">
+          <!-- Questions will be generated dynamically -->
+        </div>
+      </div>
+
+      <button id="submitBtn">সাবমিট</button>
     </div>
-
-    <button id="submitBtn"
-      style="padding: 15px 30px; background-color: #f44336; color: white; border: none; cursor: pointer; font-size: 18px; font-weight: bold; border-radius: 10px; margin-top: 20px; width: 50%; transition: background-color 0.3s ease;"
-      onmouseover="this.style.backgroundColor='#d32f2f'"
-      onmouseout="this.style.backgroundColor='#f44336'">সাবমিট</button>
-
   </div>
 
   <div class="popup" id="scorePopup">
@@ -291,6 +303,7 @@
     <div class="popup-body">
       <p><strong>মোট প্রশ্ন:</strong> <span id="totalQuestions"></span></p>
       <p><strong>উত্তর দিয়েছেন:</strong> <span style="color: #089c46;" id="answered"></span></p>
+      <p><strong>সঠিক উত্তর:</strong> <span style="color: #089c46;" id="correctAnswers"></span></p>
       <p><strong>ভুল উত্তর:</strong> <span style="color: #d32f2f;" id="wrongAnswers"></span></p>
       <p><strong>অনুত্তরিত:</strong> <span style="color: #0400fc;" id="unanswered"></span></p>
       <p><strong>আপনার চূড়ান্ত স্কোর:</strong></p>
@@ -300,7 +313,6 @@
         <span style="color: black;">সলিউশন পেতেঃ</span>
         <a href="your-link-here" style="color: #d32f2f;">এখানে ক্লিক করো</a>
       </h3>
-
 
       <button class="popup-close" onclick="closePopup()">Close</button>
     </div>
@@ -312,6 +324,8 @@
       { id: "mahbur", pass: "mahbur" },
       { id: "safayat", pass: "safayat123" }
     ];
+
+    let chartInstance = null;
 
     function validateLogin() {
       let userID = document.getElementById("userID").value;
@@ -553,14 +567,13 @@
         },
         "correct": "A"
       }
-
     ];
 
     function generateQuestions() {
-      const examContainer = document.getElementById('exam');
+      const examContainer = document.querySelector('#exam .questions-wrapper');
       questions.forEach(question => {
         const questionDiv = document.createElement('div');
-        questionDiv.classList.add('question-container');
+        questionDiv.classList.add('question-container', 'visible');
         questionDiv.setAttribute('data-question', question.id);
         questionDiv.setAttribute('data-correct', question.correct);
 
@@ -592,9 +605,107 @@
       });
     }
 
+    function initializeChart() {
+      const ctx = document.getElementById('scoreChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['সঠিক', 'ভুল', 'অনুত্তরিত'],
+          datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: ['#34c759', '#ff3b30', '#007aff'], // Vibrant Apple-inspired colors
+            borderColor: '#fff',
+            borderWidth: 3,
+            hoverOffset: 30,
+            shadowOffsetX: 3,
+            shadowOffsetY: 3,
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 0, 0, 0.3)'
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '20%', // Slight donut effect for style
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: {
+                  family: '"Hind Siliguri", sans-serif',
+                  size: 14,
+                  weight: 'bold'
+                },
+                color: '#333',
+                padding: 20,
+                boxWidth: 20,
+                generateLabels: (chart) => {
+                  const data = chart.data;
+                  return data.labels.map((label, i) => ({
+                    text: label,
+                    font: {
+                      family: '"Hind Siliguri", sans-serif'
+                    },
+                    fillStyle: data.datasets[0].backgroundColor[i],
+                    hidden: !chart.getDataVisibility(i),
+                    index: i
+                  }));
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              cornerRadius: 8,
+              titleFont: {
+                family: '"Hind Siliguri", sans-serif',
+                size: 16,
+                weight: 'bold'
+              },
+              bodyFont: {
+                family: '"Hind Siliguri", sans-serif',
+                size: 14
+              },
+              padding: 12,
+              boxPadding: 6
+            }
+          },
+          animation: {
+            animateScale: true,
+            animateRotate: true,
+            duration: 1200, // Smoother animation
+            easing: 'easeOutQuart' // Elegant easing
+          },
+          elements: {
+            arc: {
+              borderRadius: 10 // Rounded edges for segments
+            }
+          },
+          onClick: (e, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const filter = ['correct', 'wrong', 'unanswered'][index];
+              filterQuestions(filter);
+            } else {
+              filterQuestions('all');
+            }
+          }
+        }
+      });
+    }
+
+    function filterQuestions(type) {
+      document.querySelectorAll('.question-container').forEach(question => {
+        const status = question.getAttribute('data-status');
+        if (type === 'all' || status === type) {
+          question.classList.add('visible');
+        } else {
+          question.classList.remove('visible');
+        }
+      });
+    }
+
     document.getElementById("submitBtn").addEventListener("click", function () {
       stopTimer();
-      let score = 0, total = questions.length, answered = 0, wrong = 0, unanswered = 0;
+      let score = 0, total = questions.length, answered = 0, correct = 0, wrong = 0, unanswered = 0;
 
       document.querySelectorAll('.question-container').forEach((question, index) => {
         let correctAnswer = question.getAttribute('data-correct');
@@ -606,29 +717,50 @@
           if (chosenAnswer === correctAnswer) {
             selectedOption.querySelector('.option-text').classList.add('correct-text');
             score += 1;
+            correct++;
+            question.setAttribute('data-status', 'correct');
           } else {
             selectedOption.querySelector('.option-text').classList.add('incorrect-text');
             question.querySelector(`[data-option="${correctAnswer}"] .option-text`).classList.add('correct-text');
             score -= 0.25;
             wrong++;
+            question.setAttribute('data-status', 'wrong');
           }
         } else {
           question.querySelector(`[data-option="${correctAnswer}"] .option-text`).classList.add('unattempted-text');
           unanswered++;
+          question.setAttribute('data-status', 'unanswered');
         }
+        question.classList.add('visible');
       });
 
+      // Show and update chart
+      const chartContainer = document.querySelector('.chart-container');
+      chartContainer.classList.add('visible');
+      if (!chartInstance) {
+        initializeChart();
+      }
+      chartInstance.data.datasets[0].data = [correct, wrong, unanswered];
+      chartInstance.update();
+
+      // Update score popup
       document.getElementById("totalQuestions").innerText = toBengaliNumber(total);
       document.getElementById("answered").innerText = toBengaliNumber(answered);
+      document.getElementById("correctAnswers").innerText = toBengaliNumber(correct);
       document.getElementById("wrongAnswers").innerText = toBengaliNumber(wrong);
       document.getElementById("unanswered").innerText = toBengaliNumber(unanswered);
       document.getElementById("finalScore").innerText = toBengaliNumber(score.toFixed(2));
+
+      // Disable submit button
+      document.getElementById("submitBtn").style.display = "none";
 
       document.getElementById("scorePopup").style.display = "block";
     });
 
     function closePopup() {
       document.getElementById("scorePopup").style.display = "none";
+      const examTitle = document.getElementById('exam-title');
+      examTitle.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   </script>
 
