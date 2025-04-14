@@ -76,7 +76,7 @@
 
     .container {
       font-family: "Hind Siliguri", sans-serif;
-      width: 90%;
+      width: 80%;
       margin: auto;
       background-color: white;
       padding: 20px;
@@ -114,17 +114,13 @@
     }
 
     #exam {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
       width: 100%;
     }
 
     .chart-container {
       width: 200px;
-      /* Slightly larger for impact */
       height: 200px;
-      margin: 0 20px 10px 0;
+      margin: 10px auto;
       background-color: #f9f9f9;
       border-radius: 15px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -134,11 +130,6 @@
 
     .chart-container.visible {
       display: block;
-    }
-
-    .questions-wrapper {
-      flex: 1;
-      min-width: 300px;
     }
 
     .question-container {
@@ -281,19 +272,15 @@
 
   <div class="container" style="display: none;" id="examContainer">
     <div class="exam-content">
-      <h1 id="exam-title">বায়োলজি এক্স্যাম</h1>
+      <h1>বায়োলজি এক্স্যাম</h1>
       <div id="timer">০১ মিনিট ০০ সেকেন্ড</div>
       <div id="exam-info">পূর্ণ নম্বরঃ ১০০ </div>
-
-      <div id="exam">
-        <div class="chart-container">
-          <canvas id="scoreChart"></canvas>
-        </div>
-        <div class="questions-wrapper">
-          <!-- Questions will be generated dynamically -->
-        </div>
+      <div class="chart-container">
+        <canvas id="scoreChart"></canvas>
       </div>
-
+      <div id="exam">
+        <!-- Questions will be generated dynamically -->
+      </div>
       <button id="submitBtn">সাবমিট</button>
     </div>
   </div>
@@ -570,7 +557,7 @@
     ];
 
     function generateQuestions() {
-      const examContainer = document.querySelector('#exam .questions-wrapper');
+      const examContainer = document.querySelector('#exam');
       questions.forEach(question => {
         const questionDiv = document.createElement('div');
         questionDiv.classList.add('question-container', 'visible');
@@ -613,7 +600,7 @@
           labels: ['সঠিক', 'ভুল', 'অনুত্তরিত'],
           datasets: [{
             data: [0, 0, 0],
-            backgroundColor: ['#34c759', '#ff3b30', '#007aff'], // Vibrant Apple-inspired colors
+            backgroundColor: ['#34c759', '#ff3b30', '#007aff'],
             borderColor: '#fff',
             borderWidth: 3,
             hoverOffset: 30,
@@ -625,7 +612,7 @@
         },
         options: {
           responsive: true,
-          cutout: '20%', // Slight donut effect for style
+          cutout: '20%',
           plugins: {
             legend: {
               position: 'bottom',
@@ -671,12 +658,12 @@
           animation: {
             animateScale: true,
             animateRotate: true,
-            duration: 1200, // Smoother animation
-            easing: 'easeOutQuart' // Elegant easing
+            duration: 1200,
+            easing: 'easeOutQuart'
           },
           elements: {
             arc: {
-              borderRadius: 10 // Rounded edges for segments
+              borderRadius: 10
             }
           },
           onClick: (e, elements) => {
@@ -759,8 +746,7 @@
 
     function closePopup() {
       document.getElementById("scorePopup").style.display = "none";
-      const examTitle = document.getElementById('exam-title');
-      examTitle.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   </script>
 
