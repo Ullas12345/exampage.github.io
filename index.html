@@ -591,7 +591,7 @@
         });
       });
     }
-
+    //----------------------------------------------------------------------------
     function initializeChart() {
       const ctx = document.getElementById('scoreChart').getContext('2d');
       chartInstance = new Chart(ctx, {
@@ -602,29 +602,30 @@
             data: [0, 0, 0],
             backgroundColor: ['#34c759', '#ff3b30', '#007aff'],
             borderColor: '#fff',
-            borderWidth: 3,
-            hoverOffset: 30,
-            shadowOffsetX: 3,
-            shadowOffsetY: 3,
-            shadowBlur: 10,
-            shadowColor: 'rgba(0, 0, 0, 0.3)'
+            borderWidth: 2,
+            hoverOffset: 10,
+            // Removed shadow configs (not native to Chart.js and may not work)
           }]
         },
         options: {
           responsive: true,
-          cutout: '20%',
+          maintainAspectRatio: false,
+          cutout: '10%', // makes chart fuller
+          layout: {
+            padding: 10
+          },
           plugins: {
             legend: {
               position: 'bottom',
               labels: {
                 font: {
                   family: '"Hind Siliguri", sans-serif',
-                  size: 14,
+                  size: 13,
                   weight: 'bold'
                 },
                 color: '#333',
-                padding: 20,
-                boxWidth: 20,
+                padding: 12,
+                boxWidth: 14,
                 generateLabels: (chart) => {
                   const data = chart.data;
                   return data.labels.map((label, i) => ({
@@ -641,29 +642,29 @@
             },
             tooltip: {
               backgroundColor: 'rgba(0, 0, 0, 0.9)',
-              cornerRadius: 8,
+              cornerRadius: 6,
               titleFont: {
                 family: '"Hind Siliguri", sans-serif',
-                size: 16,
+                size: 14,
                 weight: 'bold'
               },
               bodyFont: {
                 family: '"Hind Siliguri", sans-serif',
-                size: 14
+                size: 13
               },
-              padding: 12,
-              boxPadding: 6
+              padding: 10,
+              boxPadding: 5
             }
           },
           animation: {
             animateScale: true,
             animateRotate: true,
-            duration: 1200,
+            duration: 1000,
             easing: 'easeOutQuart'
           },
           elements: {
             arc: {
-              borderRadius: 10
+              borderRadius: 8
             }
           },
           onClick: (e, elements) => {
